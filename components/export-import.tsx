@@ -490,7 +490,7 @@ export function ExportImport() {
 
   return (
     <TooltipProvider>
-      <div className="flex gap-2">
+      <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
         <Tooltip>
           <TooltipTrigger asChild>
             <DropdownMenu>
@@ -498,13 +498,13 @@ export function ExportImport() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="transition-all hover:scale-105 hover:shadow-md"
+                  className="transition-all hover:scale-105 hover:shadow-md w-full sm:w-auto min-w-[100px] sm:min-w-0 bg-white/90 hover:bg-white border-white/30 text-gray-800 font-semibold"
                 >
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="h-4 w-4 sm:mr-2" />
                   Export
                 </Button>
               </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className="w-[180px] sm:w-auto min-w-[200px] sm:min-w-0">
           <DropdownMenuItem onClick={exportToHTML} disabled={exporting !== null}>
             {exporting === 'html' ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin text-orange-500" />
@@ -565,9 +565,9 @@ export function ExportImport() {
               size="sm"
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="transition-all hover:scale-105 hover:shadow-md"
+              className="transition-all hover:scale-105 hover:shadow-md w-full sm:w-auto min-w-[100px] sm:min-w-0 bg-white/90 hover:bg-white border-white/30 text-gray-800 font-semibold"
             >
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="h-4 w-4 sm:mr-2" />
               Import
             </Button>
           </TooltipTrigger>

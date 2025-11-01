@@ -8,11 +8,15 @@ interface EditorStore {
   setCurrentVersion: (version: number) => void
 }
 
-// Custom storage that handles quota exceeded errors
+// Custom storage that handles quota exceeded errors and SSR
 const createSafeStorage = () => {
   return {
     getItem: (name: string): string | null => {
       try {
+        // Check if we're in browser environment
+        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+          return null
+        }
         return localStorage.getItem(name)
       } catch (error) {
         console.error('Error reading from localStorage:', error)
@@ -21,6 +25,11 @@ const createSafeStorage = () => {
     },
     setItem: (name: string, value: string): void => {
       try {
+        // Check if we're in browser environment
+        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+          return
+        }
+        
         // Check localStorage size before saving
         const currentSize = new Blob([value]).size
         const maxSize = 5 * 1024 * 1024 // 5MB limit
@@ -64,6 +73,10 @@ const createSafeStorage = () => {
     },
     removeItem: (name: string): void => {
       try {
+        // Check if we're in browser environment
+        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+          return
+        }
         localStorage.removeItem(name)
       } catch (error) {
         console.error('Error removing from localStorage:', error)

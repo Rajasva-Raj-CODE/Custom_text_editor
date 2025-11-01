@@ -259,17 +259,17 @@ export function TextEditor({ initialContent, children }: TextEditorProps) {
             </div>
           </div>
           <div 
-            className="flex justify-between items-center px-6 py-4 text-sm border-t border-blue-300/30 shadow-lg"
+            className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0 px-3 sm:px-6 py-3 sm:py-4 text-sm border-t border-blue-300/30 shadow-lg"
             style={{ background: 'linear-gradient(135deg, #2c83ec 0%, #87c232 100%)' }}
           >
-            <div className="flex items-center gap-6 font-medium">
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-md">
-                <span className="text-white/90">Words:</span>
-                <span className="font-bold text-white">{wordCount}</span>
+            <div className="flex items-center gap-3 sm:gap-6 font-medium w-full sm:w-auto justify-center sm:justify-start">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-white/20 backdrop-blur-md px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-md">
+                <span className="text-white/90 text-xs sm:text-sm">Words:</span>
+                <span className="font-bold text-white text-xs sm:text-sm">{wordCount}</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-md">
-                <span className="text-white/90">Characters:</span>
-                <span className="font-bold text-white">{characterCount}</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-white/20 backdrop-blur-md px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-md">
+                <span className="text-white/90 text-xs sm:text-sm">Chars:</span>
+                <span className="font-bold text-white text-xs sm:text-sm">{characterCount}</span>
               </div>
             </div>
             <ExportImport />

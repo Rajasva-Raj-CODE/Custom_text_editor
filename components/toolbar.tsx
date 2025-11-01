@@ -86,12 +86,18 @@ export function Toolbar({ editor }: ToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    // Load images from localStorage
-    const storedImages = Object.keys(localStorage)
-      .filter((key) => key.startsWith('editor-image-'))
-      .map((key) => localStorage.getItem(key) || '')
-      .filter((img) => img !== '')
-    setLocalStorageImages(storedImages)
+    // Load images from localStorage (only in browser)
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      try {
+        const storedImages = Object.keys(localStorage)
+          .filter((key) => key.startsWith('editor-image-'))
+          .map((key) => localStorage.getItem(key) || '')
+          .filter((img) => img !== '')
+        setLocalStorageImages(storedImages)
+      } catch (error) {
+        console.error('Error loading images from localStorage:', error)
+      }
+    }
   }, [])
 
   if (!editor) {
@@ -108,6 +114,11 @@ export function Toolbar({ editor }: ToolbarProps) {
 
   const saveImageToLocalStorage = (imageData: string): string => {
     try {
+      // Check if we're in browser environment
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return ''
+      }
+      
       // Limit image size - compress or skip if too large
       const imageSize = new Blob([imageData]).size
       const maxImageSize = 2 * 1024 * 1024 // 2MB per image
@@ -151,22 +162,24 @@ export function Toolbar({ editor }: ToolbarProps) {
         console.warn('localStorage quota exceeded for images')
         // Try to clear some old images
         try {
-          const imageKeys = Object.keys(localStorage)
-            .filter((key) => key.startsWith('editor-image-'))
-            .sort((a, b) => {
-              const timeA = parseInt(a.split('-').pop() || '0')
-              const timeB = parseInt(b.split('-').pop() || '0')
-              return timeA - timeB
-            })
-          // Remove oldest 5 images
-          for (let i = 0; i < Math.min(5, imageKeys.length); i++) {
-            localStorage.removeItem(imageKeys[i])
+          if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+            const imageKeys = Object.keys(localStorage)
+              .filter((key) => key.startsWith('editor-image-'))
+              .sort((a, b) => {
+                const timeA = parseInt(a.split('-').pop() || '0')
+                const timeB = parseInt(b.split('-').pop() || '0')
+                return timeA - timeB
+              })
+            // Remove oldest 5 images
+            for (let i = 0; i < Math.min(5, imageKeys.length); i++) {
+              localStorage.removeItem(imageKeys[i])
+            }
+            // Try saving again
+            const key = `editor-image-${Date.now()}`
+            localStorage.setItem(key, imageData)
+            setLocalStorageImages((prev) => [...prev.slice(-15), imageData])
+            return key
           }
-          // Try saving again
-          const key = `editor-image-${Date.now()}`
-          localStorage.setItem(key, imageData)
-          setLocalStorageImages((prev) => [...prev.slice(-15), imageData])
-          return key
         } catch (retryError) {
           console.error('Failed to save image after cleanup:', retryError)
           return ''
