@@ -304,7 +304,7 @@ export function ExportImport() {
               const runs: TextRun[] = []
               node.content.forEach((child: JSONContent) => {
                 if (child.type === 'text') {
-                  let textRun: TextRun = new TextRun(child.text)
+                  let textRun: TextRun = new TextRun(child.text ?? '')
 
                   if (child.marks) {
                     const marks: Record<string, unknown> = {}
@@ -314,7 +314,7 @@ export function ExportImport() {
                       else if (mark.type === 'underline') marks.underline = {}
                       else if (mark.type === 'strike') marks.strike = true
                     })
-                    textRun = new TextRun({ text: child.text, ...marks })
+                    textRun = new TextRun({ text: child.text ?? '', ...marks })
                   }
 
                   runs.push(textRun)
