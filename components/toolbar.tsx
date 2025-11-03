@@ -7,6 +7,7 @@ import {
   Italic,
   Underline,
   Strikethrough,
+  Smile,
   Heading1,
   Heading2,
   Heading3,
@@ -64,11 +65,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useState, useRef, useEffect } from 'react'
 import { ColorPicker } from './color-picker'
 import { FontSizeSelector } from './font-size-selector'
 import { FontFamilySelector } from './font-family-selector'
 import type { Editor } from '@tiptap/react'
+import dynamic from 'next/dynamic'
+import type { EmojiClickData } from 'emoji-picker-react'
+
+const EmojiPicker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 interface ToolbarProps {
   editor: Editor | null
@@ -1083,6 +1089,34 @@ export function Toolbar({ editor }: ToolbarProps) {
         </TooltipTrigger>
         <TooltipContent>
           <p>Clear Formatting</p>
+        </TooltipContent>
+      </Tooltip>
+
+        {/* Emoji Picker */}
+        <Tooltip>
+        <TooltipTrigger asChild>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="transition-all hover:scale-110 hover:bg-blue-50/50 text-blue-600 hover:text-blue-700"
+              >
+                <Smile className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="p-0 w-[340px]">
+              {/* Emoji picker is dynamically loaded client-side */}
+              <EmojiPicker
+                onEmojiClick={(emojiData: EmojiClickData) => {
+                  editor.chain().focus().insertContent(emojiData.emoji).run()
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Insert Emoji</p>
         </TooltipContent>
       </Tooltip>
       </div>
