@@ -41,14 +41,12 @@ export const ResizableImage = Image.extend({
 
   addProseMirrorPlugins() {
     return [
-      ResizeImagePlugin({
-        imageNodeType: this.type,
-      }),
+      ResizeImagePlugin(),
     ]
   },
 })
 
-const ResizeImagePlugin = (options: { imageNodeType: any }) => {
+const ResizeImagePlugin = () => {
   return new Plugin({
     key: new PluginKey('resizeImages'),
     props: {

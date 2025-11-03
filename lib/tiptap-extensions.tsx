@@ -93,39 +93,6 @@ export const extensions = [
     HTMLAttributes: {
       class: 'mention',
     },
-    suggestion: {
-      items: ({ query }: { query: string }) => {
-        const users = [
-          'Alice Johnson',
-          'Bob Smith',
-          'Charlie Brown',
-          'Diana Prince',
-          'Eve Wilson',
-        ]
-        return users
-          .filter((user) => user.toLowerCase().startsWith(query.toLowerCase()))
-          .slice(0, 5)
-      },
-      render: () => {
-        let component: any
-        let popup: any
-
-        return {
-          onStart: (props: any) => {
-            // Simple implementation
-          },
-          onUpdate: (props: any) => {
-            // Simple implementation
-          },
-          onKeyDown: (props: any) => {
-            return false
-          },
-          onExit: () => {
-            // Cleanup
-          },
-        }
-      },
-    },
   }),
   Placeholder.configure({
     placeholder: 'Start typing...',

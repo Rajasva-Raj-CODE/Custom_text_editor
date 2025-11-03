@@ -6,6 +6,7 @@ interface EditorStore {
   addToHistory: (content: string) => void
   currentVersion: number
   setCurrentVersion: (version: number) => void
+  clearAll: () => void
 }
 
 // Custom storage that handles quota exceeded errors and SSR
@@ -121,6 +122,11 @@ export const useEditorStore = create<EditorStore>()(
         }),
       currentVersion: 0,
       setCurrentVersion: (version) => set({ currentVersion: version }),
+      clearAll: () =>
+        set(() => ({
+          documentHistory: [],
+          currentVersion: 0,
+        })),
     }),
     {
       name: 'editor-storage',

@@ -3,7 +3,6 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import { extensions } from '@/lib/tiptap-extensions'
 import { Toolbar } from './toolbar'
-import { ExportImport } from './export-import'
 import { useEffect, useState } from 'react'
 import { useEditorStore } from '@/hooks/use-editor-store'
 import { debounce } from 'lodash'
@@ -227,52 +226,19 @@ export function TextEditor({ initialContent, children }: TextEditorProps) {
       <>
         <div className="flex flex-col h-full">
           <Toolbar editor={editor} />
-          <div className="flex-1 overflow-auto relative">
-            <div 
-              className={`rounded-2xl shadow-2xl transition-all relative overflow-hidden ${
-                isDragging 
-                  ? 'border-2' 
-                  : 'border-2'
-              }`}
-              style={{
-                background: isDragging 
-                  ? 'linear-gradient(to bottom right, rgba(44, 131, 236, 0.1), rgba(135, 194, 50, 0.1))'
-                  : 'linear-gradient(to bottom right, rgba(255, 255, 255, 0.98), rgba(227, 242, 253, 0.3), rgba(232, 245, 233, 0.3))',
-                borderImage: 'linear-gradient(135deg, #2c83ec 0%, #87c232 100%) 1',
-                borderStyle: 'solid',
-                boxShadow: isDragging 
-                  ? '0 20px 25px -5px rgba(44, 131, 236, 0.3), 0 10px 10px -5px rgba(135, 194, 50, 0.2)'
-                  : '0 20px 25px -5px rgba(44, 131, 236, 0.1), 0 10px 10px -5px rgba(135, 194, 50, 0.1)',
-              }}
-            >
-              {!isDragging && (
-                <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(44, 131, 236, 0.03) 0%, rgba(135, 194, 50, 0.03) 100%)' }} />
-              )}
-              {isDragging && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 backdrop-blur-sm rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(44, 131, 236, 0.15) 0%, rgba(135, 194, 50, 0.15) 100%)' }}>
-                  <div className="text-white px-8 py-4 rounded-xl shadow-2xl text-lg font-bold animate-pulse border-2 border-white/50" style={{ background: 'linear-gradient(135deg, #2c83ec 0%, #87c232 100%)' }}>
-                    ✨ Drop image here ✨
-                  </div>
-                </div>
-              )}
-              <EditorContent editor={editor} />
-            </div>
-          </div>
-          <div 
-            className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0 px-3 sm:px-6 py-3 sm:py-4 text-sm border-t border-blue-300/30 shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #2c83ec 0%, #87c232 100%)' }}
-          >
-            <div className="flex items-center gap-3 sm:gap-6 font-medium w-full sm:w-auto justify-center sm:justify-start">
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-white/20 backdrop-blur-md px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-md">
-                <span className="text-white/90 text-xs sm:text-sm">Words:</span>
-                <span className="font-bold text-white text-xs sm:text-sm">{wordCount}</span>
+          <div className="relative">
+            <EditorContent editor={editor} />
+            <div className="absolute top-2 right-2 flex items-center gap-2 bg-white/80 backdrop-blur-md border border-blue-300/40 rounded-md shadow-sm px-2 py-1">
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-gray-600">Words</span>
+                <span className="text-[11px] font-semibold text-gray-800">{wordCount}</span>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-white/20 backdrop-blur-md px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-md">
-                <span className="text-white/90 text-xs sm:text-sm">Chars:</span>
-                <span className="font-bold text-white text-xs sm:text-sm">{characterCount}</span>
+              <div className="h-3 w-px bg-blue-300/60" />
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-gray-600">Chars</span>
+                <span className="text-[11px] font-semibold text-gray-800">{characterCount}</span>
               </div>
             </div>
-            <ExportImport />
           </div>
         </div>
         {children}

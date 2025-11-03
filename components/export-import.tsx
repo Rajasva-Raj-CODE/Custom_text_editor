@@ -19,6 +19,14 @@ import {
 import TurndownService from 'turndown'
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, AlignmentType } from 'docx'
 
+type JSONContent = {
+  type?: string
+  text?: string
+  attrs?: { level?: number } & Record<string, unknown>
+  marks?: Array<{ type: string }>
+  content?: JSONContent[]
+}
+
 export function ExportImport() {
   const { editor } = useEditorContext()
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -135,7 +143,7 @@ export function ExportImport() {
     try {
       setExporting('markdown')
       const html = editor.getHTML()
-      
+
       const turndownService = new TurndownService({
         headingStyle: 'atx',
         codeBlockStyle: 'fenced',
@@ -156,7 +164,7 @@ export function ExportImport() {
       })
 
       const markdown = turndownService.turndown(html)
-      
+
       const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -175,59 +183,102 @@ export function ExportImport() {
   const exportToPDF = async () => {
     try {
       setExporting('pdf')
-      
+
       // Dynamically import html2pdf only on client side
       const html2pdf = (await import('html2pdf.js')).default
-      
+
       // Get HTML content
       const content = editor.getHTML()
-      
-      // Create a temporary div with the content
-      const tempDiv = document.createElement('div')
-      tempDiv.innerHTML = content
-      tempDiv.style.padding = '40px'
-      tempDiv.style.fontFamily = 'Arial, sans-serif'
-      tempDiv.style.fontSize = '12pt'
-      tempDiv.style.lineHeight = '1.6'
-      tempDiv.style.color = '#333'
-      
-      // Set styles for elements
+
+      // Build a pretty PDF document container and append to DOM so styles apply
+      const wrapper = document.createElement('div')
+      wrapper.style.position = 'fixed'
+      wrapper.style.inset = '0'
+      wrapper.style.pointerEvents = 'none'
+      wrapper.style.zIndex = '-1'
+
+      const container = document.createElement('div')
+      container.setAttribute('id', 'pdf-container')
+      container.style.maxWidth = '800px'
+      container.style.margin = '0 auto'
+      container.style.backgroundColor = '#ffffff'
+      container.style.borderRadius = '8px'
+      container.style.boxShadow = '0 4px 24px rgba(0,0,0,0.08)'
+      container.style.padding = '28px 36px'
+      container.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+      container.style.fontSize = '12pt'
+      container.style.lineHeight = '1.6'
+      container.style.color = '#1f2937'
+
+      // Optional header
+      const header = document.createElement('div')
+      header.style.borderBottom = '1px solid #e5e7eb'
+      header.style.marginBottom = '16px'
+      header.style.paddingBottom = '8px'
+      header.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-weight:700; font-size:14pt; color:#111827;">Exported Document</div>
+          <div style="font-size:10pt; color:#6b7280;">${new Date().toLocaleString()}</div>
+        </div>
+      `
+
+      const contentDiv = document.createElement('div')
+      contentDiv.innerHTML = content
+
+      container.appendChild(header)
+      container.appendChild(contentDiv)
+      wrapper.appendChild(container)
+      document.body.appendChild(wrapper)
+
+      // Print-enhanced styles to improve fidelity and pagination
       const style = document.createElement('style')
       style.textContent = `
-        h1 { font-size: 24pt; margin-top: 20pt; margin-bottom: 10pt; }
-        h2 { font-size: 20pt; margin-top: 18pt; margin-bottom: 8pt; }
-        h3 { font-size: 16pt; margin-top: 16pt; margin-bottom: 6pt; }
-        h4 { font-size: 14pt; margin-top: 14pt; margin-bottom: 6pt; }
-        p { margin: 8pt 0; }
-        img { max-width: 100%; height: auto; page-break-inside: avoid; }
-        table { border-collapse: collapse; width: 100%; margin: 10pt 0; page-break-inside: avoid; }
-        table td, table th { border: 1pt solid #333; padding: 5pt; }
-        pre, code { font-family: 'Courier New', monospace; }
-        blockquote { border-left: 3pt solid #ccc; padding-left: 10pt; margin: 10pt 0; }
+        #pdf-container h1 { font-size: 24pt; margin: 16pt 0 8pt; font-weight: 800; color: #111827; }
+        #pdf-container h2 { font-size: 20pt; margin: 14pt 0 8pt; font-weight: 700; color: #111827; }
+        #pdf-container h3 { font-size: 16pt; margin: 12pt 0 6pt; font-weight: 600; color: #111827; }
+        #pdf-container h4 { font-size: 14pt; margin: 10pt 0 6pt; font-weight: 600; color: #111827; }
+        #pdf-container p { margin: 8pt 0; }
+        #pdf-container img { max-width: 100%; height: auto; page-break-inside: avoid; border-radius: 6px; margin: 10pt 0; }
+        #pdf-container table { border-collapse: collapse; width: 100%; margin: 10pt 0; page-break-inside: avoid; }
+        #pdf-container table td, #pdf-container table th { border: 1pt solid #d1d5db; padding: 6pt 8pt; }
+        #pdf-container table th { background-color: #f3f4f6; color: #111827; font-weight: 700; }
+        #pdf-container pre { background: #111827; color: #f9fafb; padding: 10pt; border-radius: 6px; overflow-x: auto; }
+        #pdf-container code { font-family: 'Courier New', monospace; }
+        #pdf-container blockquote { border-left: 3pt solid #e5e7eb; padding-left: 10pt; margin: 10pt 0; color: #374151; font-style: italic; }
+        #pdf-container a { color: #2563eb; text-decoration: none; }
+        #pdf-container a:hover { text-decoration: underline; }
+        #pdf-container hr { border: none; border-top: 1pt solid #e5e7eb; margin: 12pt 0; }
+        @media print {
+          html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          #pdf-container { background: #ffffff; }
+          #pdf-container h1, #pdf-container h2, #pdf-container h3, #pdf-container h4 { page-break-after: avoid; }
+          #pdf-container table, #pdf-container img, #pdf-container pre { page-break-inside: avoid; }
+        }
       `
       document.head.appendChild(style)
-      
+
       const opt = {
-        margin: [20, 20, 20, 20] as [number, number, number, number],
+        margin: [10, 10, 10, 10] as [number, number, number, number],
         filename: 'document.pdf',
         image: { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas: { 
-          scale: 2,
+        html2canvas: {
+          scale: 3,
           useCORS: true,
           logging: false,
+          backgroundColor: '#ffffff'
         },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
           orientation: 'portrait' as const
         }
       }
 
-      await html2pdf().set(opt).from(tempDiv).save()
-      
+      await html2pdf().set(opt).from(container).save()
+
       // Cleanup
       document.head.removeChild(style)
-      tempDiv.remove()
+      wrapper.remove()
     } catch (error) {
       console.error('Error exporting PDF:', error)
       alert('Error exporting PDF. Please try again.')
@@ -239,25 +290,25 @@ export function ExportImport() {
   const exportToDocx = async () => {
     try {
       setExporting('docx')
-      
-      const json = editor.getJSON()
-      
-      const convertNodeToParagraph = (node: any): Paragraph[] => {
+
+      const json = editor.getJSON() as JSONContent
+
+      const convertNodeToParagraph = (node: JSONContent): Paragraph[] => {
         const paragraphs: Paragraph[] = []
-        
+
         if (!node || typeof node !== 'object') return paragraphs
-        
+
         switch (node.type) {
           case 'paragraph':
             if (node.content && node.content.length > 0) {
               const runs: TextRun[] = []
-              node.content.forEach((child: any) => {
+              node.content.forEach((child: JSONContent) => {
                 if (child.type === 'text') {
                   let textRun: TextRun = new TextRun(child.text)
-                  
+
                   if (child.marks) {
-                    const marks: any = {}
-                    child.marks.forEach((mark: any) => {
+                    const marks: Record<string, unknown> = {}
+                    child.marks.forEach((mark: { type: string }) => {
                       if (mark.type === 'bold') marks.bold = true
                       else if (mark.type === 'italic') marks.italics = true
                       else if (mark.type === 'underline') marks.underline = {}
@@ -265,7 +316,7 @@ export function ExportImport() {
                     })
                     textRun = new TextRun({ text: child.text, ...marks })
                   }
-                  
+
                   runs.push(textRun)
                 }
               })
@@ -274,7 +325,7 @@ export function ExportImport() {
               paragraphs.push(new Paragraph({ text: '' }))
             }
             break
-            
+
           case 'heading':
             const level = node.attrs?.level || 1
             const headingLevels = [
@@ -285,11 +336,11 @@ export function ExportImport() {
               HeadingLevel.HEADING_5,
               HeadingLevel.HEADING_6,
             ]
-            
+
             const headingText = node.content
-              ?.map((child: any) => child.type === 'text' ? child.text : '')
+              ?.map((child: JSONContent) => child.type === 'text' ? child.text ?? '' : '')
               .join('') || ''
-            
+
             paragraphs.push(
               new Paragraph({
                 text: headingText,
@@ -297,26 +348,26 @@ export function ExportImport() {
               })
             )
             break
-            
+
           case 'bulletList':
           case 'orderedList':
             if (node.content) {
-              node.content.forEach((item: any) => {
+              node.content.forEach((item: JSONContent) => {
                 if (item.type === 'listItem' && item.content) {
-                  item.content.forEach((para: any) => {
+                  item.content.forEach((para: JSONContent) => {
                     // Extract text directly from the node
                     let textContent = ''
                     if (para.content) {
-                      para.content.forEach((child: any) => {
+                      para.content.forEach((child: JSONContent) => {
                         if (child.type === 'text') {
-                          textContent += child.text
+                          textContent += child.text ?? ''
                         }
                       })
                     }
-                    
+
                     const listParagraph = new Paragraph({
                       text: textContent,
-                      ...(node.type === 'orderedList' 
+                      ...(node.type === 'orderedList'
                         ? { numbering: { reference: 'default-numbering', level: 0 } }
                         : { bullet: { level: 0 } }
                       ),
@@ -327,24 +378,24 @@ export function ExportImport() {
               })
             }
             break
-            
+
           case 'blockquote':
             if (node.content) {
-              node.content.forEach((child: any) => {
+              node.content.forEach((child: JSONContent) => {
                 // Extract text directly from the node
                 let textContent = ''
                 if (child.content) {
-                  child.content.forEach((para: any) => {
+                  child.content.forEach((para: JSONContent) => {
                     if (para.content) {
-                      para.content.forEach((textNode: any) => {
+                      para.content.forEach((textNode: JSONContent) => {
                         if (textNode.type === 'text') {
-                          textContent += textNode.text + ' '
+                          textContent += (textNode.text ?? '') + ' '
                         }
                       })
                     }
                   })
                 }
-                
+
                 paragraphs.push(
                   new Paragraph({
                     text: textContent.trim(),
@@ -362,14 +413,14 @@ export function ExportImport() {
               })
             }
             break
-            
+
           case 'hardBreak':
             paragraphs.push(new Paragraph({ text: '' }))
             break
-            
+
           case 'codeBlock':
             const codeText = node.content
-              ?.map((child: any) => child.type === 'text' ? child.text : '')
+              ?.map((child: JSONContent) => child.type === 'text' ? child.text ?? '' : '')
               .join('') || ''
             paragraphs.push(
               new Paragraph({
@@ -385,21 +436,21 @@ export function ExportImport() {
               })
             )
             break
-            
+
           case 'table':
             // Convert table to simple text representation in DOCX
             if (node.content) {
-              node.content.forEach((row: any) => {
+              node.content.forEach((row: JSONContent) => {
                 if (row.type === 'tableRow' && row.content) {
                   const rowCells: string[] = []
-                  row.content.forEach((cell: any) => {
+                  row.content.forEach((cell: JSONContent) => {
                     let cellText = ''
                     if (cell.content) {
-                      cell.content.forEach((para: any) => {
+                      cell.content.forEach((para: JSONContent) => {
                         if (para.content) {
-                          para.content.forEach((child: any) => {
+                          para.content.forEach((child: JSONContent) => {
                             if (child.type === 'text') {
-                              cellText += child.text
+                              cellText += child.text ?? ''
                             }
                           })
                         }
@@ -408,33 +459,33 @@ export function ExportImport() {
                     }
                     rowCells.push(cellText.trim())
                   })
-                  paragraphs.push(new Paragraph({ 
-                    text: `| ${rowCells.join(' | ')} |` 
+                  paragraphs.push(new Paragraph({
+                    text: `| ${rowCells.join(' | ')} |`
                   }))
                 }
               })
             }
             break
         }
-        
+
         if (node.content && Array.isArray(node.content)) {
-          node.content.forEach((child: any) => {
+          node.content.forEach((child: JSONContent) => {
             if (child.type !== 'text' && child.type !== 'hardBreak') {
               paragraphs.push(...convertNodeToParagraph(child))
             }
           })
         }
-        
+
         return paragraphs
       }
-      
+
       const children: Paragraph[] = []
       if (json.content && Array.isArray(json.content)) {
-        json.content.forEach((node: any) => {
+        json.content.forEach((node: JSONContent) => {
           children.push(...convertNodeToParagraph(node))
         })
       }
-      
+
       const doc = new Document({
         sections: [
           {
@@ -442,7 +493,7 @@ export function ExportImport() {
           },
         ],
       })
-      
+
       const blob = await Packer.toBlob(doc)
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -495,63 +546,63 @@ export function ExportImport() {
           <TooltipTrigger asChild>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   className="transition-all hover:scale-105 hover:shadow-md w-full sm:w-auto min-w-[100px] sm:min-w-0 bg-white/90 hover:bg-white border-white/30 text-gray-800 font-semibold"
                 >
-                  <Download className="h-4 w-4 sm:mr-2" />
+                  <Download className="h-4 w-4 sm:mr-2 text-blue-600" />
                   Export
                 </Button>
               </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[180px] sm:w-auto min-w-[200px] sm:min-w-0">
-          <DropdownMenuItem onClick={exportToHTML} disabled={exporting !== null}>
-            {exporting === 'html' ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin text-orange-500" />
-            ) : (
-              <FileCode className="h-4 w-4 mr-2 text-orange-500" />
-            )}
-            Export as HTML
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={exportToMarkdown} 
-            disabled={exporting !== null}
-          >
-            {exporting === 'markdown' ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin text-green-500" />
-            ) : (
-              <FileText className="h-4 w-4 mr-2 text-green-500" />
-            )}
-            Export as Markdown
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={exportToPDF} 
-            disabled={exporting !== null}
-          >
-            {exporting === 'pdf' ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin text-red-500" />
-            ) : (
-              <FileText className="h-4 w-4 mr-2 text-red-500" />
-            )}
-            Export as PDF
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={exportToDocx} 
-            disabled={exporting !== null}
-          >
-            {exporting === 'docx' ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-500" />
-            ) : (
-              <FileJson className="h-4 w-4 mr-2 text-blue-500" />
-            )}
-            Export as DOCX
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={copyAsHTML} disabled={exporting !== null}>
-            <FileCode className="h-4 w-4 mr-2 text-orange-400" />
-            Copy as HTML
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+              <DropdownMenuContent className="w-[180px] sm:w-auto min-w-[200px] sm:min-w-0">
+                <DropdownMenuItem onClick={exportToHTML} disabled={exporting !== null}>
+                  {exporting === 'html' ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin text-orange-500" />
+                  ) : (
+                    <FileCode className="h-4 w-4 mr-2 text-orange-500" />
+                  )}
+                  Export as HTML
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={exportToMarkdown}
+                  disabled={exporting !== null}
+                >
+                  {exporting === 'markdown' ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin text-green-500" />
+                  ) : (
+                    <FileText className="h-4 w-4 mr-2 text-green-500" />
+                  )}
+                  Export as Markdown
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={exportToPDF}
+                  disabled={exporting !== null}
+                >
+                  {exporting === 'pdf' ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin text-red-500" />
+                  ) : (
+                    <FileText className="h-4 w-4 mr-2 text-red-500" />
+                  )}
+                  Export as PDF
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={exportToDocx}
+                  disabled={exporting !== null}
+                >
+                  {exporting === 'docx' ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-500" />
+                  ) : (
+                    <FileJson className="h-4 w-4 mr-2 text-blue-500" />
+                  )}
+                  Export as DOCX
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={copyAsHTML} disabled={exporting !== null}>
+                  <FileCode className="h-4 w-4 mr-2 text-orange-400" />
+                  Copy as HTML
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </TooltipTrigger>
           <TooltipContent>
             <p>Export document in various formats</p>
@@ -567,7 +618,7 @@ export function ExportImport() {
               onClick={() => fileInputRef.current?.click()}
               className="transition-all hover:scale-105 hover:shadow-md w-full sm:w-auto min-w-[100px] sm:min-w-0 bg-white/90 hover:bg-white border-white/30 text-gray-800 font-semibold"
             >
-              <Upload className="h-4 w-4 sm:mr-2" />
+              <Upload className="h-4 w-4 sm:mr-2 text-green-600" />
               Import
             </Button>
           </TooltipTrigger>
