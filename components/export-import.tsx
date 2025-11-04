@@ -561,7 +561,7 @@ export function ExportImport({ editor }: ExportImportProps) {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Import HTML, Markdown, or Text files</p>
+            <p>Import HTML or Text files</p>
           </TooltipContent>
         </Tooltip>
         <input

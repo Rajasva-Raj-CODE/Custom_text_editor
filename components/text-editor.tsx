@@ -12,8 +12,6 @@ interface TextEditorProps {
 }
 
 export function TextEditor({ initialContent, children }: TextEditorProps) {
-  const [wordCount, setWordCount] = useState(0)
-  const [characterCount, setCharacterCount] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
 
   const editor = useEditor({
@@ -57,7 +55,6 @@ export function TextEditor({ initialContent, children }: TextEditorProps) {
           }
         }
         
-        // Let ProseMirror handle the drop (for moving nodes)
         return false
       },
       handleDOMEvents: {
@@ -97,13 +94,7 @@ export function TextEditor({ initialContent, children }: TextEditorProps) {
         return false
       },
     },
-    onUpdate: ({ editor }) => {
-      const text = editor.getText()
-      const words = text.trim().split(/\s+/).filter((word) => word.length > 0).length
-      const chars = editor.storage.characterCount?.characters() || 0
-      setWordCount(words)
-      setCharacterCount(chars)
-    },
+    // counts are handled inside Toolbar
   })
 
   useEffect(() => {
@@ -111,16 +102,6 @@ export function TextEditor({ initialContent, children }: TextEditorProps) {
       editor.commands.setContent(initialContent)
     }
   }, [editor, initialContent])
-
-  useEffect(() => {
-    if (editor) {
-      const text = editor.getText()
-      const words = text.trim().split(/\s+/).filter((word) => word.length > 0).length
-      const chars = editor.storage.characterCount?.characters() || 0
-      setWordCount(words)
-      setCharacterCount(chars)
-    }
-  }, [editor])
 
   if (!editor) {
     return null
@@ -131,17 +112,6 @@ export function TextEditor({ initialContent, children }: TextEditorProps) {
       <Toolbar editor={editor} />
       <div className="relative">
         <EditorContent editor={editor} />
-        <div className="absolute top-2 right-2 flex items-center gap-2 bg-white/80 backdrop-blur-md border border-blue-300/40 rounded-md shadow-sm px-2 py-1">
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] text-gray-600">Words</span>
-            <span className="text-[11px] font-semibold text-gray-800">{wordCount}</span>
-          </div>
-          <div className="h-3 w-px bg-blue-300/60" />
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] text-gray-600">Chars</span>
-            <span className="text-[11px] font-semibold text-gray-800">{characterCount}</span>
-          </div>
-        </div>
       </div>
       {children}
     </div>

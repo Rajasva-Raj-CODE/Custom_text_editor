@@ -50,7 +50,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Editor } from '@tiptap/react'
 import dynamic from 'next/dynamic'
 import type { EmojiClickData } from 'emoji-picker-react'
@@ -69,6 +69,26 @@ interface ToolbarProps {
 
 export function Toolbar({ editor }: ToolbarProps) {
   const [findReplaceOpen, setFindReplaceOpen] = useState(false)
+  const [wordCount, setWordCount] = useState(0)
+  const [characterCount, setCharacterCount] = useState(0)
+
+  useEffect(() => {
+    if (!editor) return
+
+    const updateCounts = () => {
+      const text = editor.getText()
+      const words = text.trim().split(/\s+/).filter((w) => w.length > 0).length
+      const chars = editor.storage.characterCount?.characters?.() || 0
+      setWordCount(words)
+      setCharacterCount(chars)
+    }
+
+    updateCounts()
+    editor.on('update', updateCounts)
+    return () => {
+      editor.off('update', updateCounts)
+    }
+  }, [editor])
 
   if (!editor) {
     return null
@@ -155,9 +175,8 @@ export function Toolbar({ editor }: ToolbarProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`transition-all hover:scale-110 ${
-                    editor.isActive('textStyle') ? 'text-blue-700' : 'hover:bg-blue-50/50 text-blue-600 hover:text-blue-700'
-                  }`}
+                  className={`transition-all hover:scale-110 ${editor.isActive('textStyle') ? 'text-blue-700' : 'hover:bg-blue-50/50 text-blue-600 hover:text-blue-700'
+                    }`}
                   style={{ color: editor.getAttributes('textStyle')?.color || undefined }}
                 >
                   <Palette className="h-4 w-4" />
@@ -171,7 +190,7 @@ export function Toolbar({ editor }: ToolbarProps) {
           <PopoverContent className="w-56">
             <div className="space-y-2">
               <div className="grid grid-cols-7 gap-1">
-                {['#000000','#EF4444','#F59E0B','#10B981','#3B82F6','#8B5CF6','#F472B6','#6B7280','#FFFFFF','#B91C1C','#B45309','#047857','#1D4ED8','#6D28D9','#DB2777'].map((c) => (
+                {['#000000', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#F472B6', '#6B7280', '#FFFFFF', '#B91C1C', '#B45309', '#047857', '#1D4ED8', '#6D28D9', '#DB2777'].map((c) => (
                   <button
                     key={c}
                     type="button"
@@ -204,9 +223,8 @@ export function Toolbar({ editor }: ToolbarProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`transition-all hover:scale-110 ${
-                    editor.isActive('highlight') ? 'text-blue-700' : 'hover:bg-blue-50/50 text-blue-600 hover:text-blue-700'
-                  }`}
+                  className={`transition-all hover:scale-110 ${editor.isActive('highlight') ? 'text-blue-700' : 'hover:bg-blue-50/50 text-blue-600 hover:text-blue-700'
+                    }`}
                 >
                   <Highlighter className="h-4 w-4" />
                 </Button>
@@ -219,7 +237,7 @@ export function Toolbar({ editor }: ToolbarProps) {
           <PopoverContent className="w-56">
             <div className="space-y-2">
               <div className="grid grid-cols-7 gap-1">
-                {['#FEF08A','#FDE68A','#FCA5A5','#86EFAC','#93C5FD','#C4B5FD','#FBCFE8','#E5E7EB','#F59E0B','#FB923C','#F87171','#34D399','#60A5FA','#A78BFA','#F472B6'].map((c) => (
+                {['#FEF08A', '#FDE68A', '#FCA5A5', '#86EFAC', '#93C5FD', '#C4B5FD', '#FBCFE8', '#E5E7EB', '#F59E0B', '#FB923C', '#F87171', '#34D399', '#60A5FA', '#A78BFA', '#F472B6'].map((c) => (
                   <button
                     key={c}
                     type="button"
@@ -373,11 +391,10 @@ export function Toolbar({ editor }: ToolbarProps) {
                 <Button
                   variant={editor.isActive('table') ? 'default' : 'ghost'}
                   size="icon"
-                  className={`transition-all hover:scale-110 ${
-                    editor.isActive('table')
+                  className={`transition-all hover:scale-110 ${editor.isActive('table')
                       ? 'text-white shadow-md'
                       : 'hover:bg-blue-50/50 text-blue-600 hover:text-blue-700'
-                  }`}
+                    }`}
                   style={editor.isActive('table') ? { background: 'linear-gradient(135deg, #2c83ec 0%, #87c232 100%)' } : {}}
                 >
                   <Table className="h-4 w-4" />
@@ -498,43 +515,55 @@ export function Toolbar({ editor }: ToolbarProps) {
 
         <Separator orientation="vertical" className="h-8 mx-2 shadow-sm" style={{ background: 'linear-gradient(135deg, #2c83ec 0%, #87c232 100%)' }} />
 
+
         {/* Actions */}
-        <div className="ml-auto flex items-center gap-1.5">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setFindReplaceOpen(true)}
-                className="transition-all hover:scale-110 hover:bg-blue-50/50 text-blue-600 hover:text-blue-700"
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Find & Replace (Ctrl+F)</p>
-            </TooltipContent>
-          </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearAll}
-                className="transition-all hover:scale-105 hover:bg-red-50/50 text-red-600 hover:text-red-700 font-semibold"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Clear All
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Clear All</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setFindReplaceOpen(true)}
+              className="transition-all hover:scale-110 hover:bg-blue-50/50 text-blue-600 hover:text-blue-700"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Find & Replace (Ctrl+F)</p>
+          </TooltipContent>
+        </Tooltip>
         <ExportImport editor={editor} />
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearAll}
+              className="transition-all hover:scale-105 hover:bg-red-50/50 text-red-600 hover:text-red-700 font-semibold"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear All
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Clear All</p>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Live Counters */}
+        <div className="ml-auto mr-2 hidden sm:flex items-center gap-2 px-2 py-1 rounded-md border border-blue-300/40 bg-white/70 backdrop-blur">
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-gray-600">Words</span>
+            <span className="text-[11px] font-semibold text-gray-800">{wordCount ?? 0}</span>
+          </div>
+          <div className="h-3 w-px bg-blue-300/60" />
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-gray-600">Chars</span>
+            <span className="text-[11px] font-semibold text-gray-800">{characterCount ?? 0}</span>
+          </div>
+        </div>
       </div>
     </TooltipProvider>
   )
