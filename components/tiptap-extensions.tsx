@@ -3,7 +3,7 @@ import { TextStyle } from '@tiptap/extension-text-style'
 import { Underline } from '@tiptap/extension-underline'
 import { Heading } from '@tiptap/extension-heading'
 import { Link } from '@tiptap/extension-link'
-import { ResizableImage } from './resizable-image-extension'
+import { ResizableImage } from '../lib/resizable-image-extension'
 import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
 import { TableCell } from '@tiptap/extension-table-cell'
@@ -22,7 +22,7 @@ import { Placeholder } from '@tiptap/extension-placeholder'
 import { CharacterCount } from '@tiptap/extension-character-count'
 import { Dropcursor } from '@tiptap/extension-dropcursor'
 import { Gapcursor } from '@tiptap/extension-gapcursor'
-import { FontSize } from './font-size-extension'
+import { FontSize } from '../lib/font-size-extension'
 
 export const extensions = [
   StarterKit.configure({
@@ -36,7 +36,9 @@ export const extensions = [
     orderedList: {},
     bulletList: {},
   }),
-  Color,
+  Color.configure({
+    types: ['textStyle'],
+  }),
   TextStyle,
   Underline,
   Subscript,

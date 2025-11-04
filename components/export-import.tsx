@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useEditorContext } from '@/contexts/editor-context'
+import type { Editor } from '@tiptap/react'
 import { Download, Upload, FileText, FileCode, FileJson, Loader2 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -16,8 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import TurndownService from 'turndown'
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, AlignmentType } from 'docx'
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, } from 'docx'
 
 type JSONContent = {
   type?: string
@@ -27,8 +26,11 @@ type JSONContent = {
   content?: JSONContent[]
 }
 
-export function ExportImport() {
-  const { editor } = useEditorContext()
+interface ExportImportProps {
+  editor: Editor | null
+}
+
+export function ExportImport({ editor }: ExportImportProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const [exporting, setExporting] = useState<string | null>(null)
 
@@ -135,47 +137,6 @@ export function ExportImport() {
     } catch (error) {
       console.error('Error exporting HTML:', error)
       alert('Error exporting HTML. Please try again.')
-      setExporting(null)
-    }
-  }
-
-  const exportToMarkdown = async () => {
-    try {
-      setExporting('markdown')
-      const html = editor.getHTML()
-
-      const turndownService = new TurndownService({
-        headingStyle: 'atx',
-        codeBlockStyle: 'fenced',
-        bulletListMarker: '-',
-        emDelimiter: '*',
-        strongDelimiter: '**',
-      })
-
-      // Configure custom rules for better conversion
-      turndownService.addRule('strikethrough', {
-        filter: ['del', 's'],
-        replacement: (content: string) => '~~' + content + '~~'
-      })
-
-      turndownService.addRule('highlight', {
-        filter: (node: Node) => node.nodeName === 'MARK',
-        replacement: (content: string) => '==' + content + '=='
-      })
-
-      const markdown = turndownService.turndown(html)
-
-      const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'document.md'
-      a.click()
-      URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Error exporting Markdown:', error)
-      alert('Error exporting Markdown. Please try again.')
-    } finally {
       setExporting(null)
     }
   }
@@ -509,16 +470,6 @@ export function ExportImport() {
     }
   }
 
-  const copyAsHTML = () => {
-    try {
-      const content = editor.getHTML()
-      navigator.clipboard.writeText(content)
-      alert('HTML copied to clipboard!')
-    } catch (error) {
-      console.error('Error copying HTML:', error)
-      alert('Error copying HTML. Please try again.')
-    }
-  }
 
   const importFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -549,10 +500,10 @@ export function ExportImport() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="transition-all hover:scale-105 hover:shadow-md w-full sm:w-auto min-w-[100px] sm:min-w-0 bg-white/90 hover:bg-white border-white/30 text-gray-800 font-semibold"
+                  className="transition-all hover:scale-105 hover:shadow-md bg-white/90 hover:bg-white border-white/30 text-gray-800 font-semibold"
                 >
-                  <Download className="h-4 w-4 sm:mr-2 text-blue-600" />
-                  Export
+                  <Download className="h-4 w-4  text-blue-600" />
+                
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[180px] sm:w-auto min-w-[200px] sm:min-w-0">
@@ -564,17 +515,7 @@ export function ExportImport() {
                   )}
                   Export as HTML
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={exportToMarkdown}
-                  disabled={exporting !== null}
-                >
-                  {exporting === 'markdown' ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin text-green-500" />
-                  ) : (
-                    <FileText className="h-4 w-4 mr-2 text-green-500" />
-                  )}
-                  Export as Markdown
-                </DropdownMenuItem>
+            
                 <DropdownMenuItem
                   onClick={exportToPDF}
                   disabled={exporting !== null}
@@ -597,10 +538,7 @@ export function ExportImport() {
                   )}
                   Export as DOCX
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={copyAsHTML} disabled={exporting !== null}>
-                  <FileCode className="h-4 w-4 mr-2 text-orange-400" />
-                  Copy as HTML
-                </DropdownMenuItem>
+            
               </DropdownMenuContent>
             </DropdownMenu>
           </TooltipTrigger>
@@ -616,10 +554,10 @@ export function ExportImport() {
               size="sm"
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="transition-all hover:scale-105 hover:shadow-md w-full sm:w-auto min-w-[100px] sm:min-w-0 bg-white/90 hover:bg-white border-white/30 text-gray-800 font-semibold"
+              className="transition-all hover:scale-105 hover:shadow-md bg-white/90 hover:bg-white border-white/30 text-gray-800 font-semibold"
             >
-              <Upload className="h-4 w-4 sm:mr-2 text-green-600" />
-              Import
+              <Upload className="h-4 w-4  text-green-600" />
+            
             </Button>
           </TooltipTrigger>
           <TooltipContent>
