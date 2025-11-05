@@ -56,6 +56,7 @@ import dynamic from 'next/dynamic'
 import type { EmojiClickData } from 'emoji-picker-react'
 import { FontSizeSelector } from './font-size-selector'
 import { FontFamilySelector } from './font-family-selector'
+import { SheetSizeSelector } from './sheet-size-selector'
 import { FindReplace } from './find-replace'
 import { ExportImport } from './export-import'
 import { MediaDialogs } from './media-dialogs'
@@ -108,7 +109,7 @@ export function Toolbar({ editor }: ToolbarProps) {
   return (
     <TooltipProvider>
       <div
-        className="border-b border-blue-300/30 shadow-md p-3 flex flex-wrap items-center gap-1.5 sticky top-0 z-50 backdrop-blur-sm"
+        className="border-b border-blue-300/30 shadow-md p-3 flex flex-wrap items-center gap-1.5 fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/90"
         style={{ background: 'linear-gradient(135deg, rgba(44, 131, 236, 0.1) 0%, rgba(135, 194, 50, 0.1) 100%)' }}
       >
         {/* Text Formatting */}
@@ -164,6 +165,7 @@ export function Toolbar({ editor }: ToolbarProps) {
         {/* Font Family & Size */}
         <FontFamilySelector editor={editor} />
         <FontSizeSelector editor={editor} />
+        <SheetSizeSelector editor={editor} />
 
         <Separator orientation="vertical" className="h-8 mx-2 shadow-sm" style={{ background: 'linear-gradient(135deg, #2c83ec 0%, #87c232 100%)' }} />
 

@@ -23,6 +23,7 @@ import { CharacterCount } from '@tiptap/extension-character-count'
 import { Dropcursor } from '@tiptap/extension-dropcursor'
 import { Gapcursor } from '@tiptap/extension-gapcursor'
 import { FontSize } from '../lib/font-size-extension'
+import { SheetSizeExtension } from '../components/sheet-size-selector'
 
 export const extensions = [
   StarterKit.configure({
@@ -102,5 +103,8 @@ export const extensions = [
   CharacterCount,
   Dropcursor,
   Gapcursor,
+  SheetSizeExtension.configure({
+    defaultSize: 'A4',
+  }),
 ]
 

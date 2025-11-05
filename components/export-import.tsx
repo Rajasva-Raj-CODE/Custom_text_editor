@@ -40,6 +40,10 @@ export function ExportImport({ editor }: ExportImportProps) {
     try {
       setExporting('html')
       const content = editor.getHTML()
+      const sheetSize = editor.storage.sheetSize?.getSheetSize()
+      const mmToPx = 96 / 25.4
+      const widthPx = sheetSize ? sheetSize.width * mmToPx : 800
+      
       // Create a well-formed HTML document
       const htmlDocument = `<!DOCTYPE html>
 <html lang="en">
@@ -51,7 +55,7 @@ export function ExportImport({ editor }: ExportImportProps) {
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
-      max-width: 800px;
+      max-width: ${widthPx}px;
       margin: 0 auto;
       padding: 20px;
       color: #333;
@@ -148,8 +152,11 @@ export function ExportImport({ editor }: ExportImportProps) {
       // Dynamically import html2pdf only on client side
       const html2pdf = (await import('html2pdf.js')).default
 
-      // Get HTML content
+      // Get HTML content and sheet size
       const content = editor.getHTML()
+      const sheetSize = editor.storage.sheetSize?.getSheetSize()
+      const mmToPx = 96 / 25.4
+      const widthPx = sheetSize ? sheetSize.width * mmToPx : 800
 
       // Build a pretty PDF document container and append to DOM so styles apply
       const wrapper = document.createElement('div')
@@ -160,7 +167,8 @@ export function ExportImport({ editor }: ExportImportProps) {
 
       const container = document.createElement('div')
       container.setAttribute('id', 'pdf-container')
-      container.style.maxWidth = '800px'
+      container.style.maxWidth = `${widthPx}px`
+      container.style.width = `${widthPx}px`
       container.style.margin = '0 auto'
       container.style.backgroundColor = '#ffffff'
       container.style.borderRadius = '8px'
@@ -218,6 +226,23 @@ export function ExportImport({ editor }: ExportImportProps) {
       `
       document.head.appendChild(style)
 
+      // Map sheet size to PDF format
+      const getPdfFormat = (): string | [number, number] => {
+        if (!sheetSize) return 'a4'
+        const formatMap: Record<string, string | [number, number]> = {
+          'A4': 'a4',
+          'A3': 'a3',
+          'A5': 'a5',
+          'Letter': 'letter',
+          'Legal': 'legal',
+          'Tabloid': [sheetSize.width, sheetSize.height]
+        }
+        return formatMap[sheetSize.type] || 'a4'
+      }
+
+      const pdfFormat = getPdfFormat()
+      const isCustomFormat = Array.isArray(pdfFormat)
+
       const opt = {
         margin: [10, 10, 10, 10] as [number, number, number, number],
         filename: 'document.pdf',
@@ -228,11 +253,17 @@ export function ExportImport({ editor }: ExportImportProps) {
           logging: false,
           backgroundColor: '#ffffff'
         },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait' as const
-        }
+        jsPDF: isCustomFormat
+          ? {
+              unit: 'mm' as const,
+              format: pdfFormat as [number, number],
+              orientation: 'portrait' as const
+            }
+          : {
+              unit: 'mm' as const,
+              format: pdfFormat as string,
+              orientation: 'portrait' as const
+            }
       }
 
       await html2pdf().set(opt).from(container).save()
@@ -447,9 +478,23 @@ export function ExportImport({ editor }: ExportImportProps) {
         })
       }
 
+      // Get sheet size for page dimensions (convert mm to twips: 1mm = 56.6929133858 twips)
+      const sheetSize = editor.storage.sheetSize?.getSheetSize()
+      const mmToTwips = 56.6929133858
+      const pageWidth = sheetSize ? Math.round(sheetSize.width * mmToTwips) : 11906 // A4 width in twips
+      const pageHeight = sheetSize ? Math.round(sheetSize.height * mmToTwips) : 16838 // A4 height in twips
+
       const doc = new Document({
         sections: [
           {
+            properties: {
+              page: {
+                size: {
+                  width: pageWidth,
+                  height: pageHeight,
+                },
+              },
+            },
             children: children.length > 0 ? children : [new Paragraph({ text: 'Empty document' })],
           },
         ],
