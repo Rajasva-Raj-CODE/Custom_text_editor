@@ -1,58 +1,51 @@
-'use client'
+"use client"
 
-import { Button } from '@/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-import type { Editor } from '@tiptap/react'
-import { LucideIcon } from 'lucide-react'
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { LucideIcon } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import type { Editor } from "@tiptap/react"
 
-interface ToolbarButtonProps {
+interface Props {
   editor: Editor
   icon: LucideIcon
   tooltip: string
   onClick: () => void
-  isActive?: boolean | (() => boolean)
-  disabled?: boolean | (() => boolean)
-  variant?: 'default' | 'ghost'
+  isActive: () => boolean
 }
 
-export function ToolbarButton({
-  editor,
-  icon: Icon,
-  tooltip,
-  onClick,
-  isActive = false,
-  disabled = false,
-  variant = 'ghost',
-}: ToolbarButtonProps) {
-  const active = typeof isActive === 'function' ? isActive() : isActive
-  const isDisabled = typeof disabled === 'function' ? disabled() : disabled
+export function ToolbarButton({ editor, icon: Icon, tooltip, onClick, isActive }: Props) {
+  const [, setTick] = useState(0)
 
-  const activeStyle = active
-    ? { background: 'linear-gradient(135deg, #2c83ec 0%, #87c232 100%)' }
-    : {}
+  useEffect(() => {
+    if (!editor) return
+
+    const update = () => setTick(x => x + 1)
+
+    editor.on("selectionUpdate", update)
+    editor.on("update", update)
+    editor.on("transaction", update)
+
+    return () => {
+      editor.off("selectionUpdate", update)
+      editor.off("update", update)
+      editor.off("transaction", update)
+    }
+  }, [editor])
+
+  const active = isActive()
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={active ? 'default' : variant}
             size="icon"
+            variant={active ? "default" : "ghost"}
             onClick={onClick}
-            disabled={isDisabled}
-            className={`transition-all hover:scale-110 ${
-              active
-                ? 'text-white shadow-md'
-                : 'hover:bg-blue-50/50 text-blue-600 hover:text-blue-700'
-            } ${isDisabled ? 'opacity-30' : ''}`}
-            style={activeStyle}
+            className={active ? "bg-blue-600 text-white" : "text-blue-600"}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="w-4 h-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -62,4 +55,3 @@ export function ToolbarButton({
     </TooltipProvider>
   )
 }
-
