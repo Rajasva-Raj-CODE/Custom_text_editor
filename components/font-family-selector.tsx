@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/tooltip'
 import type { Editor } from '@tiptap/react'
 import { Type } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 const fontFamilies = [
   { label: 'Default', value: '' },
@@ -27,7 +28,26 @@ const fontFamilies = [
 ]
 
 export function FontFamilySelector({ editor }: { editor: Editor }) {
-  const currentFamily = editor.getAttributes('textStyle').fontFamily || ''
+  const [currentFamily, setCurrentFamily] = useState('')
+
+  useEffect(() => {
+    if (!editor) return
+
+    const updateState = () => {
+      const family = editor.getAttributes('textStyle').fontFamily || ''
+      setCurrentFamily(family)
+    }
+
+    updateState()
+
+    editor.on('selectionUpdate', updateState)
+    editor.on('transaction', updateState)
+
+    return () => {
+      editor.off('selectionUpdate', updateState)
+      editor.off('transaction', updateState)
+    }
+  }, [editor])
 
   const setFontFamily = (family: string) => {
     if (family) {
@@ -35,6 +55,7 @@ export function FontFamilySelector({ editor }: { editor: Editor }) {
     } else {
       editor.chain().focus().unsetFontFamily().run()
     }
+    setCurrentFamily(family)
   }
 
   return (
@@ -49,7 +70,9 @@ export function FontFamilySelector({ editor }: { editor: Editor }) {
                 className="transition-all hover:scale-105 min-w-[120px] justify-start"
               >
                 <Type className="h-4 w-4 mr-2" />
-                <span className="truncate">{currentFamily || 'Default'}</span>
+                <span className="truncate">
+                  {currentFamily || "Default"}
+                </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="min-w-[180px]">
@@ -57,7 +80,9 @@ export function FontFamilySelector({ editor }: { editor: Editor }) {
                 <DropdownMenuItem
                   key={family.value}
                   onClick={() => setFontFamily(family.value)}
-                  className="cursor-pointer transition-colors hover:bg-gray-100"
+                  className={`cursor-pointer transition-colors hover:bg-gray-100 ${
+                    currentFamily === family.value ? "bg-blue-50" : ""
+                  }`}
                 >
                   <span style={{ fontFamily: family.value }}>{family.label}</span>
                 </DropdownMenuItem>
@@ -72,4 +97,3 @@ export function FontFamilySelector({ editor }: { editor: Editor }) {
     </TooltipProvider>
   )
 }
-

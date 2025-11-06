@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/tooltip'
 import type { Editor } from '@tiptap/react'
 import { Type } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 const fontSizes = [
   { label: 'Small', value: '12px' },
@@ -26,10 +27,30 @@ const fontSizes = [
 ]
 
 export function FontSizeSelector({ editor }: { editor: Editor }) {
-  const currentSize = editor.getAttributes('textStyle').fontSize || '16px'
+  const [currentSize, setCurrentSize] = useState('16px')
+
+  useEffect(() => {
+    if (!editor) return
+
+    const updateState = () => {
+      const size = editor.getAttributes('textStyle').fontSize || '16px'
+      setCurrentSize(size)
+    }
+
+    updateState()
+
+    editor.on('selectionUpdate', updateState)
+    editor.on('transaction', updateState)
+
+    return () => {
+      editor.off('selectionUpdate', updateState)
+      editor.off('transaction', updateState)
+    }
+  }, [editor])
 
   const setFontSize = (size: string) => {
     editor.chain().focus().setFontSize(size).run()
+    setCurrentSize(size)
   }
 
   return (
@@ -52,10 +73,16 @@ export function FontSizeSelector({ editor }: { editor: Editor }) {
                 <DropdownMenuItem
                   key={size.value}
                   onClick={() => setFontSize(size.value)}
-                  className="cursor-pointer transition-colors hover:bg-gray-100"
+                  className={`cursor-pointer transition-colors hover:bg-gray-100 
+                    ${currentSize === size.value ? 'bg-blue-50' : ''}`}
                 >
-                  <span style={{ fontSize: size.value }}>{size.label}</span>
-                  <span className="ml-auto text-xs text-gray-500">({size.value})</span>
+                  <span style={{ fontSize: size.value }}>
+                    {size.label}
+                  </span>
+
+                  <span className="ml-auto text-xs text-gray-500">
+                    ({size.value})
+                  </span>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -68,4 +95,3 @@ export function FontSizeSelector({ editor }: { editor: Editor }) {
     </TooltipProvider>
   )
 }
-
