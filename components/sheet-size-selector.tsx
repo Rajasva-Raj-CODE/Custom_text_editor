@@ -107,12 +107,12 @@ export function SheetSizeSelector({ editor }: { editor: Editor }) {
                 <span className="truncate">{currentSize.type}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[200px]">
+            <DropdownMenuContent className="min-w-[180px] bg-white shadow-lg border border-gray-200">
               {SHEET_OPTIONS.map((opt) => (
                 <DropdownMenuItem
                   key={opt.type}
                   onClick={() => editor.commands.setSheetSize(SHEET_SIZES[opt.type])}
-                  className={`cursor-pointer ${currentSize.type === opt.type ? 'bg-blue-50' : ''}`}
+                  className={`cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-200${currentSize.type === opt.type ? 'bg-blue-50 dark:bg-blue-200 font-medium' : ''}`}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   <div className="flex flex-col">

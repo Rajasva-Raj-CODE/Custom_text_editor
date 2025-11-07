@@ -30,34 +30,24 @@ const fontFamilies = [
 export function FontFamilySelector({ editor }: { editor: Editor }) {
   const [currentFamily, setCurrentFamily] = useState('')
 
-  useEffect(() => {
-    if (!editor) return
+useEffect(() => {
+if (!editor) return
+const updateState = () => setCurrentFamily(editor.getAttributes('textStyle').fontFamily || '')
+updateState()
+editor.on('selectionUpdate', updateState)
+editor.on('transaction', updateState)
+return () => {
+editor.off('selectionUpdate', updateState)
+editor.off('transaction', updateState)
+}
+}, [editor])
 
-    const updateState = () => {
-      const family = editor.getAttributes('textStyle').fontFamily || ''
-      setCurrentFamily(family)
-    }
 
-    updateState()
-
-    editor.on('selectionUpdate', updateState)
-    editor.on('transaction', updateState)
-
-    return () => {
-      editor.off('selectionUpdate', updateState)
-      editor.off('transaction', updateState)
-    }
-  }, [editor])
-
-  const setFontFamily = (family: string) => {
-    if (family) {
-      editor.chain().focus().setFontFamily(family).run()
-    } else {
-      editor.chain().focus().unsetFontFamily().run()
-    }
-    setCurrentFamily(family)
-  }
-
+const setFontFamily = (family: string) => {
+if (family) editor.chain().focus().setFontFamily(family).run()
+else editor.chain().focus().unsetFontFamily().run()
+setCurrentFamily(family)
+}
   return (
     <TooltipProvider>
       <Tooltip>
@@ -75,13 +65,13 @@ export function FontFamilySelector({ editor }: { editor: Editor }) {
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[180px]">
+            <DropdownMenuContent className="min-w-[180px] bg-white shadow-lg border border-gray-200">
               {fontFamilies.map((family) => (
                 <DropdownMenuItem
                   key={family.value}
                   onClick={() => setFontFamily(family.value)}
-                  className={`cursor-pointer transition-colors hover:bg-gray-100 ${
-                    currentFamily === family.value ? "bg-blue-50" : ""
+                  className={`cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-200 ${
+                    currentFamily === family.value ? "bg-blue-50 dark:bg-blue-200 font-medium" : ""
                   }`}
                 >
                   <span style={{ fontFamily: family.value }}>{family.label}</span>

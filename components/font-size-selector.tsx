@@ -29,29 +29,23 @@ const fontSizes = [
 export function FontSizeSelector({ editor }: { editor: Editor }) {
   const [currentSize, setCurrentSize] = useState('16px')
 
-  useEffect(() => {
-    if (!editor) return
+useEffect(() => {
+if (!editor) return
+const updateState = () => setCurrentSize(editor.getAttributes('textStyle').fontSize || '16px')
+updateState()
+editor.on('selectionUpdate', updateState)
+editor.on('transaction', updateState)
+return () => {
+editor.off('selectionUpdate', updateState)
+editor.off('transaction', updateState)
+}
+}, [editor])
 
-    const updateState = () => {
-      const size = editor.getAttributes('textStyle').fontSize || '16px'
-      setCurrentSize(size)
-    }
 
-    updateState()
-
-    editor.on('selectionUpdate', updateState)
-    editor.on('transaction', updateState)
-
-    return () => {
-      editor.off('selectionUpdate', updateState)
-      editor.off('transaction', updateState)
-    }
-  }, [editor])
-
-  const setFontSize = (size: string) => {
-    editor.chain().focus().setFontSize(size).run()
-    setCurrentSize(size)
-  }
+const setFontSize = (size: string) => {
+editor.chain().focus().setFontSize(size).run()
+setCurrentSize(size)
+}
 
   return (
     <TooltipProvider>
@@ -68,13 +62,13 @@ export function FontSizeSelector({ editor }: { editor: Editor }) {
                 {currentSize}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[150px]">
+            <DropdownMenuContent className="min-w-[180px] bg-white shadow-lg border border-gray-200">
               {fontSizes.map((size) => (
                 <DropdownMenuItem
                   key={size.value}
                   onClick={() => setFontSize(size.value)}
-                  className={`cursor-pointer transition-colors hover:bg-gray-100 
-                    ${currentSize === size.value ? 'bg-blue-50' : ''}`}
+                  className={`cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-200 
+                    ${currentSize === size.value ? 'bg-blue-50 dark:bg-blue-200 font-medium' : ''}`}
                 >
                   <span style={{ fontSize: size.value }}>
                     {size.label}

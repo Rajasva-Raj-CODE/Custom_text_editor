@@ -139,9 +139,9 @@ export function TextEditor({ initialContent, children }: TextEditorProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen ">
+    <div className="flex flex-col min-h-screen">
       <Toolbar editor={editor} />
-      <div className="relative pt-25">
+      <div className="relative pt-20">
         <EditorContent editor={editor} />
       </div>
       {children}

@@ -33,6 +33,7 @@ import {
   Split,
   Merge,
   Search,
+  Heading,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,6 +66,7 @@ import { FindReplace } from "./find-replace";
 import { ExportImport } from "./export-import";
 import { MediaDialogs } from "./media-dialogs";
 import { ToolbarButton } from "./toolbar-button";
+import { HeadingSelector } from "./HeadingSelector";
 
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
@@ -184,11 +186,10 @@ export function Toolbar({ editor }: ToolbarProps) {
         />
 
         {/* Font Family & Size */}
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
           <FontFamilySelector editor={editor} />
           <FontSizeSelector editor={editor} />
           <SheetSizeSelector editor={editor} />{" "}
-          {/* If this is considered 'size' */}
         </div>
 
         <Separator
@@ -357,7 +358,7 @@ export function Toolbar({ editor }: ToolbarProps) {
           </Popover>
 
           {/* Headings */}
-          <Tooltip>
+          {/* <Tooltip>
             <TooltipTrigger asChild>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -369,11 +370,11 @@ export function Toolbar({ editor }: ToolbarProps) {
                     <Heading1 className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="min-w-[180px] bg-white shadow-lg border border-gray-200">
                   {([1, 2, 3, 4, 5, 6] as const).map((level) => (
                     <DropdownMenuItem
                       key={level}
-                      className={`cursor-pointer transition-colors hover:bg-gray-100 `}
+                      className={`cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-200   `}
                       onClick={() =>
                         editor.chain().focus().toggleHeading({ level }).run()
                       }
@@ -397,7 +398,8 @@ export function Toolbar({ editor }: ToolbarProps) {
             <TooltipContent>
               <p>Headings</p>
             </TooltipContent>
-          </Tooltip>
+          </Tooltip> */}
+      <HeadingSelector editor={editor}/>
         </div>
         <Separator
           orientation="vertical"
