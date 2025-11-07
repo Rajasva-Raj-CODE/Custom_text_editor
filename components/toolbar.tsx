@@ -98,15 +98,16 @@ export function Toolbar({ editor }: ToolbarProps) {
 
   return (
     <TooltipProvider>
-      <div className="border-b border-gray-200/50 shadow-lg p-2 flex flex-wrap items-center gap-2 fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/95  ">
+      <div className="border-b border-gray-200/50 shadow-lg py-2 px-1 flex flex-wrap items-center gap-2 fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/95  ">
         {/* Text Formatting */}
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           <ToolbarButton
             editor={editor}
             icon={Bold}
             tooltip="Bold (Ctrl+B)"
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={() => editor.isActive("bold")}
+          
           />
           <ToolbarButton
             editor={editor}
