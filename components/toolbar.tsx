@@ -8,9 +8,6 @@ import {
   Smile,
   Palette,
   Highlighter,
-  Heading1,
-  Heading2,
-  Heading3,
   List,
   ListOrdered,
   ListTodo,
@@ -26,23 +23,10 @@ import {
   Subscript,
   Superscript,
   Minus,
-  FileText,
-  Table,
-  Plus,
   Trash2,
-  Split,
-  Merge,
   Search,
-  Heading,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import {
   Popover,
@@ -67,6 +51,7 @@ import { ExportImport } from "./export-import";
 import { MediaDialogs } from "./media-dialogs";
 import { ToolbarButton } from "./toolbar-button";
 import { HeadingSelector } from "./HeadingSelector";
+import { SmartTableMenu } from "./table-selector";
 
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
@@ -104,14 +89,6 @@ export function Toolbar({ editor }: ToolbarProps) {
     return null;
   }
 
-  const insertTable = (rows: number, cols: number) => {
-    editor
-      .chain()
-      .focus()
-      .insertTable({ rows, cols, withHeaderRow: true })
-      .run();
-  };
-
   const handleClearAll = () => {
     if (!editor) return;
     const confirmed = window.confirm("Clear the entire document?");
@@ -123,7 +100,7 @@ export function Toolbar({ editor }: ToolbarProps) {
     <TooltipProvider>
       <div className="border-b border-gray-200/50 shadow-lg p-2 flex flex-wrap items-center gap-2 fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/95  ">
         {/* Text Formatting */}
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           <ToolbarButton
             editor={editor}
             icon={Bold}
@@ -157,10 +134,10 @@ export function Toolbar({ editor }: ToolbarProps) {
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Subscript/Superscript */}
           <ToolbarButton
             editor={editor}
@@ -181,12 +158,12 @@ export function Toolbar({ editor }: ToolbarProps) {
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
 
         {/* Font Family & Size */}
-        <div className="flex items-center rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           <FontFamilySelector editor={editor} />
           <FontSizeSelector editor={editor} />
           <SheetSizeSelector editor={editor} />{" "}
@@ -196,10 +173,10 @@ export function Toolbar({ editor }: ToolbarProps) {
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Text Color & Highlight */}
           <Popover>
             <Tooltip>
@@ -356,59 +333,17 @@ export function Toolbar({ editor }: ToolbarProps) {
               </div>
             </PopoverContent>
           </Popover>
-
           {/* Headings */}
-          {/* <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="transition-all hover:scale-105"
-                  >
-                    <Heading1 className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="min-w-[180px] bg-white shadow-lg border border-gray-200">
-                  {([1, 2, 3, 4, 5, 6] as const).map((level) => (
-                    <DropdownMenuItem
-                      key={level}
-                      className={`cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-200   `}
-                      onClick={() =>
-                        editor.chain().focus().toggleHeading({ level }).run()
-                      }
-                    >
-                      {level === 1 && <Heading1 className="h-4 w-4 mr-2" />}
-                      {level === 2 && <Heading2 className="h-4 w-4 mr-2" />}
-                      {level === 3 && <Heading3 className="h-4 w-4 mr-2" />}
-                      Heading {level}
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => editor.chain().focus().setParagraph().run()}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Paragraph
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Headings</p>
-            </TooltipContent>
-          </Tooltip> */}
-      <HeadingSelector editor={editor}/>
+          <HeadingSelector editor={editor} />
         </div>
         <Separator
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Lists */}
           <ToolbarButton
             editor={editor}
@@ -436,10 +371,10 @@ export function Toolbar({ editor }: ToolbarProps) {
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Alignment */}
           <ToolbarButton
             editor={editor}
@@ -474,10 +409,10 @@ export function Toolbar({ editor }: ToolbarProps) {
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Block Elements */}
           <ToolbarButton
             editor={editor}
@@ -505,134 +440,25 @@ export function Toolbar({ editor }: ToolbarProps) {
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
-        <div className="flex items-center rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Media */}
           <MediaDialogs editor={editor} />
 
           {/* Table Menu */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant={editor.isActive("table") ? "default" : "ghost"}
-                    size="icon"
-                    className={`transition-all hover:scale-110 ${
-                      editor.isActive("table")
-                        ? "text-black shadow-md"
-                        : "hover:bg-blue-50/50 text-blue-600 hover:text-blue-700"
-                    }`}
-                  
-                  >
-                    <Table className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => insertTable(3, 3)}>
-                    Insert Table (3x3)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => insertTable(4, 4)}>
-                    Insert Table (4x4)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => insertTable(5, 5)}>
-                    Insert Table (5x5)
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {editor.isActive("table") && (
-                    <>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          editor.chain().focus().addColumnBefore().run()
-                        }
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Column Before
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          editor.chain().focus().addColumnAfter().run()
-                        }
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Column After
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          editor.chain().focus().deleteColumn().run()
-                        }
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Column
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() =>
-                          editor.chain().focus().addRowBefore().run()
-                        }
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Row Before
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          editor.chain().focus().addRowAfter().run()
-                        }
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Row After
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => editor.chain().focus().deleteRow().run()}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Row
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() =>
-                          editor.chain().focus().mergeCells().run()
-                        }
-                      >
-                        <Merge className="h-4 w-4 mr-2" />
-                        Merge Cells
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => editor.chain().focus().splitCell().run()}
-                      >
-                        <Split className="h-4 w-4 mr-2" />
-                        Split Cell
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() =>
-                          editor.chain().focus().deleteTable().run()
-                        }
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Table
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Table</p>
-            </TooltipContent>
-          </Tooltip>
+          <SmartTableMenu editor={editor} />
         </div>
 
         <Separator
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* History */}
           <ToolbarButton
             editor={editor}
@@ -653,12 +479,12 @@ export function Toolbar({ editor }: ToolbarProps) {
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
 
         {/* Clear Formatting */}
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           <ToolbarButton
             editor={editor}
             icon={Type}
@@ -709,10 +535,10 @@ export function Toolbar({ editor }: ToolbarProps) {
           orientation="vertical"
           className="h-8  shadow-sm"
           style={{
-            background: "linear-gradient(135deg, #2c83ec 0%, #87c232 100%)",
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
           }}
         />
-        <div className="flex items-center   rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Actions */}
           <Tooltip>
             <TooltipTrigger asChild>
@@ -731,8 +557,8 @@ export function Toolbar({ editor }: ToolbarProps) {
           </Tooltip>
           <ExportImport editor={editor} />
         </div>
-        
-        <div className="flex items-center rounded-full bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
+
+        <div className="flex items-center rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -751,7 +577,7 @@ export function Toolbar({ editor }: ToolbarProps) {
           </Tooltip>
         </div>
         {/* Live Counters */}
-        <div className="ml-auto mr-2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
+        <div className="ml-auto mr-2 flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
           <div className="flex items-center ga">
             <span className="text-[10px] text-gray-600">Words</span>
             <span className="text-[11px] font-semibold text-gray-800">
