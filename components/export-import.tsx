@@ -537,7 +537,7 @@ export function ExportImport({ editor }: ExportImportProps) {
 
   return (
     <TooltipProvider>
-      <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
+      <div className="flex w-full sm:w-auto justify-center sm:justify-end">
         <Tooltip>
           <TooltipTrigger asChild>
             <DropdownMenu>

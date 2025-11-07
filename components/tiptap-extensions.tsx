@@ -69,8 +69,8 @@ export const extensions = [
   }),
   Table.configure({
     resizable: true,
-    HTMLAttributes: {
-      class: 'border-collapse',
+   HTMLAttributes: {
+      class: "border-collapse border border-gray-300 w-full",
     },
   }),
   TableRow,

@@ -67,7 +67,7 @@ export function FontFamilySelector({ editor }: { editor: Editor }) {
               <Button 
                 variant="ghost" 
                 size="sm"
-                className="transition-all hover:scale-105 min-w-[120px] justify-start"
+                className="transition-all hover:scale-105 "
               >
                 <Type className="h-4 w-4 mr-2" />
                 <span className="truncate">
@@ -97,3 +97,4 @@ export function FontFamilySelector({ editor }: { editor: Editor }) {
     </TooltipProvider>
   )
 }
+

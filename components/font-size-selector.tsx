@@ -95,3 +95,4 @@ export function FontSizeSelector({ editor }: { editor: Editor }) {
     </TooltipProvider>
   )
 }
+
