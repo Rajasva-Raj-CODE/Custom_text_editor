@@ -495,13 +495,13 @@ export function Toolbar({ editor }: ToolbarProps) {
           </Tooltip>
           <ExportImport editor={editor} />
         </div>
-        <FieldInsert onInsert={handleFieldInsert} />
+
         <FindReplace
           editor={editor}
           open={findReplaceOpen}
           onOpenChange={setFindReplaceOpen}
         />
-
+        <FieldInsert onInsert={handleFieldInsert} />
         <div className="flex items-center rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,,0.05)]">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -522,17 +522,17 @@ export function Toolbar({ editor }: ToolbarProps) {
         </div>
 
         {/* Live Counters */}
-        <div className="ml-auto mr-2 flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
-          <div className="flex items-center ga">
-            <span className="text-[10px] text-gray-600">Words</span>
-            <span className="text-[11px] font-semibold text-gray-800">
+        <div className="ml-auto mr-2 flex items-center gap-2 px-3 py-1 rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center ">
+            <span className="text-[11px] text-gray-600">Words</span>
+            <span className="text-[10px] font-semibold text-gray-800">
               {wordCount ?? 0}
             </span>
           </div>
           <div className="h-3 w-px bg-blue-300/60" />
           <div className="flex items-center ga">
-            <span className="text-[10px] text-gray-600">Chars</span>
-            <span className="text-[11px] font-semibold text-gray-800">
+            <span className="text-[11px] text-gray-600">Chars</span>
+            <span className="text-[10px] font-semibold text-gray-800">
               {characterCount ?? 0}
             </span>
           </div>

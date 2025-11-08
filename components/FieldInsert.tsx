@@ -269,7 +269,7 @@ export default function FieldInsert({
   }, [categoryValue, fieldMap]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-4">
       {/* Category Combo Box */}
       <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
         <PopoverTrigger asChild>
@@ -278,11 +278,13 @@ export default function FieldInsert({
             variant="outline"
             role="combobox"
             aria-expanded={categoryOpen}
-            className="w-[170px] justify-between"
+            className="w-[170px] justify-between overflow-hidden text-ellipsis whitespace-nowrap"
           >
-            {categoryValue
-              ? categories.find((c) => c.value === categoryValue)?.label
-              : "Select category..."}
+            <span className="truncate max-w-[120px]">
+              {categoryValue
+                ? categories.find((c) => c.value === categoryValue)?.label
+                : "Select category..."}
+            </span>
             <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
