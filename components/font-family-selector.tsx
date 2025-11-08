@@ -56,16 +56,16 @@ setCurrentFamily(family)
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
-                size="sm"
+                size="xs"
                 className="transition-all hover:scale-105 "
               >
-                <Type className="h-4 w-4 mr-2" />
-                <span className="truncate">
+                <Type className="h-3 w-3 mr-2" />
+                <span className="truncate text-xs">
                   {currentFamily || "Default"}
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[180px] bg-white shadow-lg border border-gray-200">
+            <DropdownMenuContent className="min-w-[140px] bg-white shadow-lg border border-gray-200">
               {fontFamilies.map((family) => (
                 <DropdownMenuItem
                   key={family.value}

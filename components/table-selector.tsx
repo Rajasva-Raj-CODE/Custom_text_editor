@@ -77,7 +77,7 @@ export const SmartTableMenu: React.FC<SmartTableMenuProps> = ({
           <DropdownMenuTrigger asChild>
             <Button
               variant={isTableActive ? "default" : "ghost"}
-              size="icon"
+           size="xs"
               className={`transition-all hover:scale-110 ${
                 isTableActive
                   ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"

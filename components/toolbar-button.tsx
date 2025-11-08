@@ -43,7 +43,7 @@ export function ToolbarButton({ editor, icon: Icon, tooltip, onClick, isActive }
             size="icon"
             variant="ghost" // Use ghost for base, and rely on className for active state
             onClick={onClick}
-            className={`h-8 w-8 rounded-full ${ // Enforce consistent size and shape
+            className={`h-6 w-6 rounded-full ${ // Enforce consistent size and shape
               active 
                 ? "bg-gray-200 text-gray-800 shadow-inner" // Subtle active state
                 : "text-gray-600 hover:bg-gray-100" // Subtle inactive hover

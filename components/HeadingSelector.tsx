@@ -94,15 +94,15 @@ export function HeadingSelector({ editor }: { editor: Editor }) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
+             size="xs"
                 className={`transition-all hover:scale-105 ${
                   activeFormat !== 'Paragraph' ? 'bg-gray-100' : '' // Subtle highlight on active format
                 }`}
               >
-                <ActiveIcon className="h-4 w-4" /> {/* Dynamic Icon */}
+                <ActiveIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[180px] bg-white shadow-md border border-gray-200">
+            <DropdownMenuContent className="min-w-[130px] bg-white shadow-md border border-gray-200">
               
               {headingLevels.map((level) => {
                 const isCurrentHeading = editor.isActive('heading', { level })

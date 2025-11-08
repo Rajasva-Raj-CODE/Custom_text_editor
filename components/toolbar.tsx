@@ -27,7 +27,6 @@ import {
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Popover,
   PopoverContent,
@@ -53,6 +52,7 @@ import { ToolbarButton } from "./toolbar-button";
 import { HeadingSelector } from "./HeadingSelector";
 import { SmartTableMenu } from "./table-selector";
 import FieldInsert from "@/components/FieldInsert";
+import { cn } from "@/lib/utils";
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 interface ToolbarProps {
@@ -103,7 +103,7 @@ export function Toolbar({ editor }: ToolbarProps) {
     <TooltipProvider>
       <div className="border-b border-gray-200/50 shadow-lg py-2 px-1 flex flex-wrap items-center gap-2 fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/95  ">
         {/* Text Formatting */}
-        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           <ToolbarButton
             editor={editor}
             icon={Bold}
@@ -133,14 +133,8 @@ export function Toolbar({ editor }: ToolbarProps) {
             isActive={() => editor.isActive("strike")}
           />
         </div>
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200 ">
           {/* Subscript/Superscript */}
           <ToolbarButton
             editor={editor}
@@ -157,29 +151,15 @@ export function Toolbar({ editor }: ToolbarProps) {
             isActive={() => editor.isActive("subscript")}
           />
         </div>
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
 
         {/* Font Family & Size */}
-        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+        <div className="flex items-center rounded-md  bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           <FontFamilySelector editor={editor} />
           <FontSizeSelector editor={editor} />
           <SheetSizeSelector editor={editor} />{" "}
         </div>
 
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Text Color & Highlight */}
           <Popover>
             <Tooltip>
@@ -187,8 +167,8 @@ export function Toolbar({ editor }: ToolbarProps) {
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className={`transition-all hover:scale-110 ${
+                    size="xs"
+                    className={`transition-all hover:scale-110  ${
                       editor.isActive("textStyle")
                         ? "text-blue-700"
                         : "hover:bg-blue-50/50 text-blue-600 hover:text-blue-700"
@@ -196,6 +176,7 @@ export function Toolbar({ editor }: ToolbarProps) {
                     style={{
                       color:
                         editor.getAttributes("textStyle")?.color || undefined,
+
                     }}
                   >
                     <Palette className="h-4 w-4" />
@@ -206,7 +187,7 @@ export function Toolbar({ editor }: ToolbarProps) {
                 <p>Text Color</p>
               </TooltipContent>
             </Tooltip>
-            <PopoverContent className="w-56">
+            <PopoverContent className="w-56 bg-white/90">
               <div className="space-y-2">
                 <div className="grid grid-cols-7 ga">
                   {[
@@ -230,7 +211,9 @@ export function Toolbar({ editor }: ToolbarProps) {
                       key={c}
                       type="button"
                       onClick={() => editor.chain().focus().setColor(c).run()}
-                      className="h-6 w-6 rounded border"
+                      className={cn(
+                        "h-6 w-6 rounded border cursor-pointer hover:bg-gray-100 data-[selected=true]:bg-gray-200 transition-colors"
+                      )}
                       style={{ backgroundColor: c }}
                       aria-label={`Set text color ${c}`}
                     />
@@ -247,7 +230,7 @@ export function Toolbar({ editor }: ToolbarProps) {
                   />
                   <Button
                     variant="outline"
-                    size="sm"
+                    size="xs"
                     onClick={() => editor.chain().focus().unsetColor().run()}
                   >
                     Reset
@@ -263,7 +246,7 @@ export function Toolbar({ editor }: ToolbarProps) {
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="xs"
                     className={`transition-all hover:scale-110 ${
                       editor.isActive("highlight")
                         ? "text-blue-700"
@@ -278,7 +261,7 @@ export function Toolbar({ editor }: ToolbarProps) {
                 <p>Highlight</p>
               </TooltipContent>
             </Tooltip>
-            <PopoverContent className="w-56">
+            <PopoverContent className="w-56 bg-white/90">
               <div className="space-y-2">
                 <div className="grid grid-cols-7 ga">
                   {[
@@ -304,7 +287,9 @@ export function Toolbar({ editor }: ToolbarProps) {
                       onClick={() =>
                         editor.chain().focus().setHighlight({ color: c }).run()
                       }
-                      className="h-6 w-6 rounded border"
+                      className={cn(
+                        "h-6 w-6 rounded border cursor-pointer hover:bg-gray-100 data-[selected=true]:bg-gray-200 transition-colors"
+                      )}
                       style={{ backgroundColor: c }}
                       aria-label={`Set highlight ${c}`}
                     />
@@ -325,7 +310,7 @@ export function Toolbar({ editor }: ToolbarProps) {
                   />
                   <Button
                     variant="outline"
-                    size="sm"
+                    size="xs"
                     onClick={() =>
                       editor.chain().focus().unsetHighlight().run()
                     }
@@ -339,14 +324,8 @@ export function Toolbar({ editor }: ToolbarProps) {
           {/* Headings */}
           <HeadingSelector editor={editor} />
         </div>
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Lists */}
           <ToolbarButton
             editor={editor}
@@ -370,14 +349,8 @@ export function Toolbar({ editor }: ToolbarProps) {
             isActive={() => editor.isActive("taskList")}
           />
         </div>
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Alignment */}
           <ToolbarButton
             editor={editor}
@@ -408,14 +381,8 @@ export function Toolbar({ editor }: ToolbarProps) {
             isActive={() => editor.isActive({ textAlign: "justify" })}
           />
         </div>
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+
+        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Block Elements */}
           <ToolbarButton
             editor={editor}
@@ -439,14 +406,8 @@ export function Toolbar({ editor }: ToolbarProps) {
             isActive={() => editor.isActive("horizontalRule")}
           />
         </div>
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
-        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+
+        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Media */}
           <MediaDialogs editor={editor} />
 
@@ -454,14 +415,7 @@ export function Toolbar({ editor }: ToolbarProps) {
           <SmartTableMenu editor={editor} />
         </div>
 
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* History */}
           <ToolbarButton
             editor={editor}
@@ -478,16 +432,9 @@ export function Toolbar({ editor }: ToolbarProps) {
             isActive={() => editor.isActive("redo")}
           />
         </div>
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
 
         {/* Clear Formatting */}
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+        <div className="flex items-center rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           <ToolbarButton
             editor={editor}
             icon={Type}
@@ -504,7 +451,7 @@ export function Toolbar({ editor }: ToolbarProps) {
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="xs"
                     className="transition-all hover:scale-110 hover:bg-blue-50/50 text-blue-600 hover:text-blue-700"
                   >
                     <Smile className="h-4 w-4" />
@@ -528,20 +475,14 @@ export function Toolbar({ editor }: ToolbarProps) {
             </TooltipContent>
           </Tooltip>
         </div>
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
-        <div className="flex items-center   rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
+
+        <div className="flex items-center  rounded-md bg-white shadow-[0px_1px_2px_rgba(0,0,,0.05),_inset_0px_-1px_1px_rgba(0,0,0,0.05)] border border-gray-200">
           {/* Actions */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
+                size="xs"
                 onClick={() => setFindReplaceOpen(true)}
                 className="transition-all hover:scale-110 hover:bg-blue-50/50 text-blue-600 hover:text-blue-700"
               >
@@ -560,24 +501,17 @@ export function Toolbar({ editor }: ToolbarProps) {
           open={findReplaceOpen}
           onOpenChange={setFindReplaceOpen}
         />
-        <Separator
-          orientation="vertical"
-          className="h-8  shadow-sm"
-          style={{
-            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
-          }}
-        />
 
-        <div className="flex items-center rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
+        <div className="flex items-center rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,,0.05)]">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
-                size="sm"
+                size="xs"
                 onClick={handleClearAll}
                 className="transition-all hover:scale-105 hover:bg-red-50/50 text-red-600 hover:text-red-700 font-semibold"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="h-3 w-3 mr-2" />
                 Clear All
               </Button>
             </TooltipTrigger>

@@ -269,24 +269,25 @@ export default function FieldInsert({
   }, [categoryValue, fieldMap]);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2">
       {/* Category Combo Box */}
       <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
         <PopoverTrigger asChild>
           <Button
+            size="xs"
             variant="outline"
             role="combobox"
             aria-expanded={categoryOpen}
-            className="w-[200px] justify-between"
+            className="w-[170px] justify-between"
           >
             {categoryValue
               ? categories.find((c) => c.value === categoryValue)?.label
               : "Select category..."}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[200px] p-0 bg-white shadow-lg border border-gray-200 "
+          className="w-[270px] p-0 bg-white shadow-lg border border-gray-200 "
           sideOffset={4}
           onWheel={(e) => e.stopPropagation()}
         >
@@ -310,7 +311,7 @@ export default function FieldInsert({
                     {category.label}
                     <Check
                       className={cn(
-                        "ml-auto h-4 w-4",
+                        "ml-auto h-3 w-3",
                         categoryValue === category.value
                           ? "opacity-100"
                           : "opacity-0"
@@ -329,17 +330,18 @@ export default function FieldInsert({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
+            size="xs"
             role="combobox"
             aria-expanded={fieldOpen}
             disabled={!categoryValue}
-            className="w-[200px] justify-between"
+            className="w-[170px] justify-between"
           >
             Select field...
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[200px] p-0  bg-white shadow-lg border border-gray-200"
+          className="w-[230px] p-0 bg-white shadow-lg border border-gray-200"
           sideOffset={4}
           onWheel={(e) => e.stopPropagation()}
         >

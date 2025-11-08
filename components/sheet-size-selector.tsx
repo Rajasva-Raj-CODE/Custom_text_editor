@@ -102,12 +102,12 @@ export function SheetSizeSelector({ editor }: { editor: Editor }) {
         <TooltipTrigger asChild>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="transition-all hover:scale-105 min-w-[100px] justify-start">
-                <Ruler className="h-4 w-4 mr-2" />
-                <span className="truncate">{currentSize.type}</span>
+              <Button variant="ghost"    size="xs" className="transition-all hover:scale-105  justify-start">
+                <Ruler className="h-3 w-3 mr-2" />
+               <span className="truncate text-xs">{currentSize.type}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[180px] bg-white shadow-lg border border-gray-200">
+            <DropdownMenuContent className="min-w-[140px] bg-white shadow-lg border border-gray-200">
               {SHEET_OPTIONS.map((opt) => (
                 <DropdownMenuItem
                   key={opt.type}

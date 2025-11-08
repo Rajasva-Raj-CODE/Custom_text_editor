@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import type { Editor } from '@tiptap/react'
-import { Type } from 'lucide-react'
+import { PencilRuler, } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const fontSizes = [
@@ -55,20 +55,23 @@ setCurrentSize(size)
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
-                size="sm"
-                className="transition-all hover:scale-105 min-w-[80px] justify-start"
+              size="xs"
+                className="transition-all hover:scale-105 justify-start"
               >
-                <Type className="h-4 w-4 mr-2" />
+                <PencilRuler className="h-3 w-3 mr-2 " />
+                <span className="truncate text-xs">
+
                 {currentSize}
+                </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[180px] bg-white shadow-lg border border-gray-200">
+            <DropdownMenuContent className="min-w-[140px] bg-white shadow-lg border border-gray-200">
               {fontSizes.map((size) => (
                 <DropdownMenuItem
                   key={size.value}
                   onClick={() => setFontSize(size.value)}
                   className={`cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-200 
-                    ${currentSize === size.value ? 'bg-blue-50 dark:bg-blue-200 font-medium' : ''}`}
+                    ${currentSize === size.value ? 'bg-blue-50 dark:bg-blue-200 font-medium ' : ''}`}
                 >
                   <span style={{ fontSize: size.value }}>
                     {size.label}
