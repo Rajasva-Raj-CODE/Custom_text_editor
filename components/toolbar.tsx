@@ -52,7 +52,7 @@ import { MediaDialogs } from "./media-dialogs";
 import { ToolbarButton } from "./toolbar-button";
 import { HeadingSelector } from "./HeadingSelector";
 import { SmartTableMenu } from "./table-selector";
-
+import FieldInsert from "@/components/FieldInsert";
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 interface ToolbarProps {
@@ -95,6 +95,9 @@ export function Toolbar({ editor }: ToolbarProps) {
     if (!confirmed) return;
     editor.chain().focus().clearContent(true).run();
   };
+  const handleFieldInsert = (field: string) => {
+    editor.chain().focus().insertContent(`{{${field}}}`).run();
+  };
 
   return (
     <TooltipProvider>
@@ -107,7 +110,6 @@ export function Toolbar({ editor }: ToolbarProps) {
             tooltip="Bold (Ctrl+B)"
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={() => editor.isActive("bold")}
-          
           />
           <ToolbarButton
             editor={editor}
@@ -526,12 +528,6 @@ export function Toolbar({ editor }: ToolbarProps) {
             </TooltipContent>
           </Tooltip>
         </div>
-
-        <FindReplace
-          editor={editor}
-          open={findReplaceOpen}
-          onOpenChange={setFindReplaceOpen}
-        />
         <Separator
           orientation="vertical"
           className="h-8  shadow-sm"
@@ -558,6 +554,19 @@ export function Toolbar({ editor }: ToolbarProps) {
           </Tooltip>
           <ExportImport editor={editor} />
         </div>
+        <FieldInsert onInsert={handleFieldInsert} />
+        <FindReplace
+          editor={editor}
+          open={findReplaceOpen}
+          onOpenChange={setFindReplaceOpen}
+        />
+        <Separator
+          orientation="vertical"
+          className="h-8  shadow-sm"
+          style={{
+            background: "linear-gradient(135deg, #E6D8C3 0%, #CBB79A 100%)",
+          }}
+        />
 
         <div className="flex items-center rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
           <Tooltip>
@@ -577,6 +586,7 @@ export function Toolbar({ editor }: ToolbarProps) {
             </TooltipContent>
           </Tooltip>
         </div>
+
         {/* Live Counters */}
         <div className="ml-auto mr-2 flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-100 border border-gray-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
           <div className="flex items-center ga">

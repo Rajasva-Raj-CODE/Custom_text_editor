@@ -210,42 +210,58 @@ export default function FieldInsert({
     { salary_head_name: string; salary_type: string }[]
   >([]);
 
-  // useEffect(() => {
-  //     const fetchSalaryDatapoints = async () => {
-  //         try {
-  //             const res = await GetAllSalaryStructureDatapoint(0, 1);
+  useEffect(() => {
+    const fetchSalaryDatapoints = async () => {
+      // Mock data since GetAllSalaryStructureDatapoint is commented out
+      const mockData = {
+        data: [
+          {
+            calculation_table: {
+              calculation_heads: [
+                { salary_head_name: "Basic Salary", salary_type: "EARNING" },
+                { salary_head_name: "HRA", salary_type: "EARNING" },
+                { salary_head_name: "PF", salary_type: "DEDUCTION" },
+              ],
+            },
+          },
+        ],
+      };
 
-  //             if (res?.data?.length > 0) {
-  //                 type CalculationHead = {
-  //                     salary_head_name: string;
-  //                     salary_type: "EARNING" | "DEDUCTION" | string;
-  //                 };
+      try {
+        // const res = await GetAllSalaryStructureDatapoint(0, 1);
+        const res = mockData;
 
-  //                 const calcHeads: CalculationHead[] =
-  //                     res.data[0]?.calculation_table?.calculation_heads || [];
+        if (res?.data?.length > 0) {
+          type CalculationHead = {
+            salary_head_name: string;
+            salary_type: "EARNING" | "DEDUCTION" | string;
+          };
 
-  //                 const salaryFields = calcHeads
-  //                     .filter(
-  //                         (h): h is CalculationHead =>
-  //                             typeof h.salary_head_name === "string" &&
-  //                             typeof h.salary_type === "string"
-  //                     )
-  //                     .map((h) => h.salary_head_name);
+          const calcHeads: CalculationHead[] =
+            res.data[0]?.calculation_table?.calculation_heads || [];
 
-  //                 setSalaryHeads(calcHeads);
+          const salaryFields = calcHeads
+            .filter(
+              (h): h is CalculationHead =>
+                typeof h.salary_head_name === "string" &&
+                typeof h.salary_type === "string"
+            )
+            .map((h) => h.salary_head_name);
 
-  //                 setFieldMap((prev) => ({
-  //                     ...prev,
-  //                     "Salary Structure": [...prev["Salary Structure"], ...salaryFields],
-  //                 }));
-  //             }
-  //         } catch (error) {
-  //             console.error("Error fetching salary structure datapoints:", error);
-  //         }
-  //     };
+          setSalaryHeads(calcHeads);
 
-  //     fetchSalaryDatapoints();
-  // }, []);
+          setFieldMap((prev) => ({
+            ...prev,
+            "Salary Structure": [...prev["Salary Structure"], ...salaryFields],
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching salary structure datapoints:", error);
+      }
+    };
+
+    fetchSalaryDatapoints();
+  }, []);
 
   const fields = useMemo(() => {
     if (!categoryValue) return [];
@@ -253,7 +269,7 @@ export default function FieldInsert({
   }, [categoryValue, fieldMap]);
 
   return (
-    <div className="flex items-center gap-4 mb-4">
+    <div className="flex items-center gap-4">
       {/* Category Combo Box */}
       <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
         <PopoverTrigger asChild>
@@ -261,7 +277,7 @@ export default function FieldInsert({
             variant="outline"
             role="combobox"
             aria-expanded={categoryOpen}
-            className="w-[300px] justify-between"
+            className="w-[200px] justify-between"
           >
             {categoryValue
               ? categories.find((c) => c.value === categoryValue)?.label
@@ -270,7 +286,7 @@ export default function FieldInsert({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[300px] p-0"
+          className="w-[200px] p-0 bg-white shadow-lg border border-gray-200 "
           sideOffset={4}
           onWheel={(e) => e.stopPropagation()}
         >
@@ -283,10 +299,13 @@ export default function FieldInsert({
                   <CommandItem
                     key={category.value}
                     value={category.value}
-                    // onSelect={(currentValue) => {
-                    //     setCategoryValue(currentValue);
-                    //     setCategoryOpen(false);
-                    // }}
+                    onSelect={(currentValue) => {
+                      setCategoryValue(currentValue);
+                      setCategoryOpen(false);
+                    }}
+                    className={cn(
+                      "cursor-pointer hover:bg-gray-100 data-[selected=true]:bg-gray-200 transition-colors"
+                    )}
                   >
                     {category.label}
                     <Check
@@ -313,14 +332,14 @@ export default function FieldInsert({
             role="combobox"
             aria-expanded={fieldOpen}
             disabled={!categoryValue}
-            className="w-[300px] justify-between"
+            className="w-[200px] justify-between"
           >
             Select field...
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[300px] p-0"
+          className="w-[200px] p-0  bg-white shadow-lg border border-gray-200"
           sideOffset={4}
           onWheel={(e) => e.stopPropagation()}
         >
@@ -346,6 +365,7 @@ export default function FieldInsert({
                         onInsert(`{{${field}}}`);
                         setFieldOpen(false);
                       }}
+                      className="cursor-pointer hover:bg-gray-100 data-[selected=true]:bg-gray-200 transition-colors"
                     >
                       {label}
                     </CommandItem>
