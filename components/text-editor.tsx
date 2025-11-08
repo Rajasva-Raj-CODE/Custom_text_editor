@@ -108,7 +108,6 @@ export function TextEditor({ initialContent, children }: TextEditorProps) {
         return false;
       },
     },
-    // counts are handled inside Toolbar
   });
 
   useEffect(() => {

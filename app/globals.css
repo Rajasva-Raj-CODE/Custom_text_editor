@@ -40,6 +40,8 @@
   outline: none;
   padding: 1rem;
   min-height: 400px;
+
+  overflow: hidden;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
@@ -182,4 +184,15 @@ th,
 td {
   border: 1px solid #ddd;
   padding: 6px;
+}
+
+.ProseMirror table {
+  max-width: 100% !important;
+  table-layout: fixed;   /* prevents column overflow during resize */
+}
+.ProseMirror table td,
+.ProseMirror table th {
+  max-width: 100%;
+  overflow: hidden;     /* hide oversized content */
+  word-wrap: break-word;
 }
